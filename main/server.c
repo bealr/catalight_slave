@@ -51,9 +51,6 @@ int server_get(struct server_t *server, struct light_t *light) {
         return 0;
 
     memcpy(&msg_req, rx_buffer, sizeof(struct server_message_req_t));
-    printf("UDP from: %d\n", msg_req.device_id);
-
-    printf("r : %d\n", msg_req.r);
 
     if (msg_req.device_id == 0) {
 

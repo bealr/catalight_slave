@@ -5,12 +5,19 @@
 #include "server.h"
 #include "esp_timer.h"
 
+unsigned int test;
+
 static void IRAM_ATTR udp_timer_callback(void *arg)
 {
     struct server_message_req_t *server_message_req = (struct server_message_req_t *) arg;
 
-    if (wifi_is_connected())
+    printf("send udp %d! ", test++);
+    if (wifi_is_connected()) {
         server_send(server_message_req);
+        printf("ok\n");
+    }
+    else
+        printf("no wifi \n");
 }
 
 void udp_timer_start(struct server_message_req_t *server_message_req)
@@ -51,7 +58,7 @@ void app_main(void)
         server_message_req.b = light->b;
         server_message_req.w = light->w;
         server_message_req.y = light->y;
-        server_message_req.device_id = 3;
+        server_message_req.device_id = 2;
         server_message_req.rssi = wifi_get_rssi();
 
         light_ctrl(light);
