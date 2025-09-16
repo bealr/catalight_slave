@@ -50,6 +50,8 @@ void app_main(void)
 
     udp_timer_start(&server_message_req);
 
+    light->w = 10;
+
     while (1) {
         server_get(server, light);
 
@@ -58,7 +60,7 @@ void app_main(void)
         server_message_req.b = light->b;
         server_message_req.w = light->w;
         server_message_req.y = light->y;
-        server_message_req.device_id = 2;
+        server_message_req.device_id = 3;
         server_message_req.rssi = wifi_get_rssi();
 
         light_ctrl(light);
