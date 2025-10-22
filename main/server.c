@@ -54,7 +54,7 @@ int server_get(struct server_t *server, struct light_t *light) {
 
     if (msg_req.device_id == 0) {
 
-        printf("the r : %d\n", msg_req.r );
+        //printf("the r : %d\n", msg_req.r );
 
         light->r = msg_req.r;
         light->g = msg_req.g;

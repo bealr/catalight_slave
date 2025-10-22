@@ -13,7 +13,7 @@
 #define WIFI_SSID      "BEALIGHT"
 #define WIFI_PASS      "12345678"
 
-#define ESP_IP      "192.168.1.4"
+#define ESP_IP      "192.168.1.3"
 #define ESP_GW      "192.168.1.1"
 #define ESP_NETMASK "255.255.255.0"
 

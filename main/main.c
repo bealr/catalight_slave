@@ -4,17 +4,39 @@
 #include "wifi.h"
 #include "server.h"
 #include "esp_timer.h"
+#include "adc.h"
 
 unsigned int test;
+
+static void IRAM_ATTR voltage_timer_callback(void *arg)
+{
+    struct adc_t *adc = (struct adc_t *) arg;
+
+    get_batt_voltage(adc);
+}
+
+void voltage_timer_start(struct adc_t *adc)
+{
+    const esp_timer_create_args_t timer_args = {
+        .callback = &voltage_timer_callback,
+        .arg = adc,
+        .dispatch_method = ESP_TIMER_TASK, // ou ESP_TIMER_ISR
+        .name = "last_seen"
+    };
+
+    esp_timer_handle_t timer;
+    ESP_ERROR_CHECK(esp_timer_create(&timer_args, &timer));
+    ESP_ERROR_CHECK(esp_timer_start_periodic(timer, 500000));
+}
 
 static void IRAM_ATTR udp_timer_callback(void *arg)
 {
     struct server_message_req_t *server_message_req = (struct server_message_req_t *) arg;
 
-    printf("send udp %d! ", test++);
+    //printf("send udp %d! ", test++);
     if (wifi_is_connected()) {
         server_send(server_message_req);
-        printf("ok\n");
+        //printf("ok\n");
     }
     else
         printf("no wifi \n");
@@ -39,16 +61,20 @@ void app_main(void)
     struct light_t *light;
     struct server_message_req_t server_message_req;
     struct server_t *server;
+    struct adc_t *adc;
+
 
     wifi_init();
     light = light_init();
     server = server_init(1234);
+    adc = adc_init();
 
     gpio_reset_pin(15);
     gpio_set_direction(15, GPIO_MODE_OUTPUT);
     gpio_set_level(15, 0); // blue led on the esp pcb
 
     udp_timer_start(&server_message_req);
+    voltage_timer_start(adc);
 
     light->w = 10;
 
@@ -60,8 +86,9 @@ void app_main(void)
         server_message_req.b = light->b;
         server_message_req.w = light->w;
         server_message_req.y = light->y;
-        server_message_req.device_id = 3;
+        server_message_req.device_id = 2;
         server_message_req.rssi = wifi_get_rssi();
+        server_message_req.voltage = adc->percent;
 
         light_ctrl(light);
 
